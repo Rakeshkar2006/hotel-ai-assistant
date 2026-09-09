@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel AI Assistant - WebSocket Test</title>
+</head>
+
+<body>
+
+    <h2>Hotel AI Assistant - WebSocket Test</h2>
+
+    <label>JWT Token:</label>
+    <br>
+    <input
+        id="token"
+        type="text"
+        placeholder="Paste your JWT token here"
+        style="width: 500px;"
+    >
+
+    <br><br>
+
+    <button onclick="connectWebSocket()">
+        Connect
+    </button>
+
+    <br><br>
+
+    <label>Question:</label>
+    <br>
+    <input
+        id="question"
+        type="text"
+        value="What time is breakfast?"
+        style="width: 500px;"
+    >
+
+    <br><br>
+
+    <button onclick="sendQuestion()">
+        Send Question
+    </button>
+
+    <h3>Response:</h3>
+
+    <pre id="output"></pre>
+
+
+    <script>
+
+        let socket = null;
+
+
+        function showOutput(message) {
+            document.getElementById("output").textContent +=
+                message + "\n\n";
+        }
+
+
+        function connectWebSocket() {
+
+            const token =
+                document.getElementById("token").value.trim();
+
+            if (!token) {
+                alert("Please enter your JWT token.");
+                return;
+            }
+
+            socket = new WebSocket(
+                "ws://127.0.0.1:8000/chat/ws"
+            );
+
+
+            socket.onopen = function() {
+
+                showOutput(
+                    "Connected to WebSocket server."
+                );
+
+                socket.send(
+                    JSON.stringify({
+                        token: token
+                    })
+                );
+            };
+
+
+            socket.onmessage = function(event) {
+
+                const data =
+                    JSON.parse(event.data);
+
+                showOutput(
+                    JSON.stringify(data, null, 2)
+                );
+            };
+
+
+            socket.onerror = function(error) {
+
+                showOutput(
+                    "WebSocket error occurred."
+                );
+            };
+
+
+            socket.onclose = function() {
+
+                showOutput(
+                    "WebSocket connection closed."
+                );
+            };
+        }
+
+
+        function sendQuestion() {
+
+            if (!socket ||
+                socket.readyState !== WebSocket.OPEN) {
+
+                alert(
+                    "Please connect to WebSocket first."
+                );
+
+                return;
+            }
+
+
+            const question =
+                document.getElementById("question").value.trim();
+
+
+            if (!question) {
+
+                alert(
+                    "Please enter a question."
+                );
+
+                return;
+            }
+
+
+            socket.send(
+                JSON.stringify({
+                    question: question
+                })
+            );
+        }
+
+    </script>
+
+</body>
+</html>

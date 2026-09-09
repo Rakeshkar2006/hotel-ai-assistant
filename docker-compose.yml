@@ -1,0 +1,12 @@
+services:
+  hotel-ai-assistant:
+    build: .
+    container_name: hotel-ai-assistant-container
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:Rakesh2006@host.docker.internal:5432/hotel_ai_db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

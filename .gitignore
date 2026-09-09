@@ -1,0 +1,20 @@
+# Virtual environment
+.venv/
+
+# Environment variables and secrets
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# IDE
+.vscode/
+
+# Test/cache
+.pytest_cache/
+.coverage
+
+# Generated data
+data/storage/
+data/vector_index/
