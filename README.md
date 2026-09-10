@@ -202,3 +202,68 @@ hotel-ai-assistant/
 ├── pytest.ini
 ├── requirements.txt
 └── README.md
+## Installation and Setup
+
+### 1. Create Virtual Environment
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+### 2. Install Dependencies
+
+```powershell
+pip install -r requirements.txt
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env` file using `.env.example` as the template.
+
+Do not commit `.env`, passwords, JWT tokens, or API keys to GitHub.
+
+### 4. Run Database Migrations
+
+```powershell
+alembic upgrade head
+```
+
+### 5. Start the FastAPI Server
+
+```powershell
+uvicorn app.main:app --reload
+```
+
+API documentation is available at `/docs`.
+
+## Testing
+
+Run the automated tests with:
+
+```powershell
+pytest
+```
+
+## Docker
+
+Start the application with Docker Compose:
+
+```powershell
+docker compose up --build
+```
+
+Stop the containers with:
+
+```powershell
+docker compose down
+```
+
+## Screenshots and Demo Evidence
+
+Project demonstration screenshots are available in `docs/screenshots/`.
+
+The screenshots cover authentication, room and guest management, booking validation, service requests, document indexing, RAG chatbot responses, access control, RAG fallback, and WebSocket chat.
+
+## Individual Project
+
+This project is developed and presented as an individual complete project. All major components are integrated into a single application, including authentication, hotel management, booking, service requests, knowledge document processing, RAG-based guest assistance, WebSocket chat, automated testing, and Docker deployment.
