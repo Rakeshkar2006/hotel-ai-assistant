@@ -1,0 +1,3 @@
+Hotel check-in time is 2:00 PM.
+Hotel check-out time is 11:00 AM.
+Guests must show a valid ID during check-in.

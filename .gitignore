@@ -16,6 +16,7 @@ __pycache__/
 .coverage
 
 # Generated data
-data/storage/
+data/storage/*
+!data/storage/*.txt
 data/vector_index/
 README_backup.md
