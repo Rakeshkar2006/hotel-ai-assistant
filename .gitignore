@@ -18,3 +18,4 @@ __pycache__/
 # Generated data
 data/storage/
 data/vector_index/
+README_backup.md
