@@ -34,3 +34,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
         "30",
     )
 )
+
+LLM_PROVIDER = os.getenv(
+    "LLM_PROVIDER",
+    "retrieval_only",
+)
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
