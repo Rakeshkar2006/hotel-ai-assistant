@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Hotel AI Assistant</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7f9;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #12343b;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            border: none;
+            border-radius: 7px;
+            background: #087f8c;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #056873;
+        }
+
+        #status {
+            margin-top: 15px;
+            padding: 10px;
+            background: #eef5f6;
+            border-radius: 7px;
+        }
+
+        #chatBox {
+            margin-top: 20px;
+            padding: 15px;
+            min-height: 120px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        }
+
+        .sources {
+            margin-top: 15px;
+            padding: 12px;
+            background: #eef5f6;
+            border-radius: 7px;
+        }
+
+        .source-item {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🏨 Hotel AI Assistant</h1>
+
+    <label for="token">Guest JWT Token</label>
+    <input
+        type="password"
+        id="token"
+        placeholder="Paste your Guest JWT token"
+    >
+
+    <button onclick="connectWebSocket()">
+        Connect to Hotel Assistant
+    </button>
+
+    <div id="status">
+        Status: Not connected
+    </div>
+
+    <label for="question">Your Question</label>
+
+    <textarea
+        id="question"
+        placeholder="Example: What time is breakfast served?"
+    ></textarea>
+
+    <button onclick="sendQuestion()">
+        Send Question
+    </button>
+
+    <div id="chatBox">
+        Answer will appear here...
+    </div>
+
+    <div id="sources" class="sources">
+        <strong>Sources:</strong>
+        <div id="sourceList">No sources yet.</div>
+    </div>
+
+</div>
+
+
+<script>
+
+    let socket = null;
+
+
+    function connectWebSocket() {
+
+        const token = document.getElementById("token").value.trim();
+
+        if (!token) {
+            alert("Please enter your Guest JWT token.");
+            return;
+        }
+
+        socket = new WebSocket(
+            `ws://${window.location.host}/chat/ws`
+        );
+
+
+        socket.onopen = function () {
+
+            document.getElementById("status").innerText =
+                "Status: WebSocket connected. Authenticating...";
+
+            socket.send(
+                JSON.stringify({
+                    token: token
+                })
+            );
+        };
+
+
+        socket.onmessage = function (event) {
+
+            const data = JSON.parse(event.data);
+
+            console.log("WebSocket response:", data);
+
+
+            if (data.message === "WebSocket authentication successful") {
+
+                document.getElementById("status").innerText =
+                    "Status: ✅ Connected and authenticated";
+
+                return;
+            }
+
+
+            if (data.answer) {
+
+                document.getElementById("chatBox").innerText =
+                    data.answer;
+
+
+                const sourceList =
+                    document.getElementById("sourceList");
+
+                sourceList.innerHTML = "";
+
+
+                if (data.sources && data.sources.length > 0) {
+
+                    data.sources.forEach(function (source) {
+
+                        const div =
+                            document.createElement("div");
+
+                        div.className = "source-item";
+
+                        div.innerText =
+                            `Document: ${source.title}
+                             | File: ${source.file_name}
+                             | Chunk: ${source.chunk_index}`;
+
+                        sourceList.appendChild(div);
+                    });
+
+                } else {
+
+                    sourceList.innerText =
+                        "No document sources.";
+                }
+            }
+        };
+
+
+        socket.onerror = function () {
+
+            document.getElementById("status").innerText =
+                "Status: ❌ WebSocket error";
+        };
+
+
+        socket.onclose = function () {
+
+            document.getElementById("status").innerText =
+                "Status: WebSocket disconnected";
+        };
+    }
+
+
+    function sendQuestion() {
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+
+            alert("Please connect to the WebSocket first.");
+
+            return;
+        }
+
+
+        const question =
+            document.getElementById("question").value.trim();
+
+
+        if (!question) {
+
+            alert("Please enter a question.");
+
+            return;
+        }
+
+
+        socket.send(
+            JSON.stringify({
+                question: question
+            })
+        );
+
+
+        document.getElementById("chatBox").innerText =
+            "Thinking...";
+    }
+
+</script>
+
+</body>
+</html>

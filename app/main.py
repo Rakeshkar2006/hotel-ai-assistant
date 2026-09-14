@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 
 from app.api.endpoints.auth import router as auth_router
 from app.api.endpoints.room_types import router as room_types_router
@@ -17,15 +20,33 @@ app = FastAPI(
 
 
 app.include_router(auth_router)
+
 app.include_router(room_types_router)
+
 app.include_router(rooms_router)
+
 app.include_router(guests_router)
+
 app.include_router(bookings_router)
+
 app.include_router(service_requests_router)
+
 app.include_router(documents_router)
+
 app.include_router(chat_router)
 
 
 @app.get("/health", tags=["Health"])
 def health_check():
     return {"status": "ok"}
+
+
+@app.get("/chat.html", include_in_schema=False)
+def chat_page():
+    chat_file = (
+        Path(__file__).resolve().parent.parent
+        / "frontend"
+        / "chat.html"
+    )
+
+    return FileResponse(chat_file)
